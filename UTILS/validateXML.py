@@ -1,14 +1,24 @@
 import xml.etree.ElementTree as ET
+import argparse
 
-def validate_xml(xml_file):
+# Funzione per validare il file XML
+def validate_xml(xodr_file):
     try:
         # Prova a parsare il file XML
-        tree = ET.parse(xml_file)
-        print(f"{xml_file} è ben formato.")
+        tree = ET.parse(xodr_file)
+        print(f"{xodr_file} è ben formato.")
     except ET.ParseError as e:
         print(f"Errore nel file XML: {e}")
 
-# Specifica il percorso del file XML
-xml_file = 'Bari_map.xodr'
+# Funzione principale
+def main():
+    parser = argparse.ArgumentParser(description="Valida un file XODR.")
+    parser.add_argument('--xodr', required=True, help='Percorso del file XODR da validare')
+    args = parser.parse_args()
 
-validate_xml(xml_file)
+    xodr_file = args.xodr
+    validate_xml(xodr_file)
+
+# Esempio di utilizzo
+if __name__ == "__main__":
+    main()
