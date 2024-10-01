@@ -5,8 +5,7 @@ import os
 import time
 from filelock import FileLock
 
-
-# 1. Caricare i dati dal file JSON
+# Funzione per caricare i dati dal file JSON
 def load_data():
     with FileLock('C:/Users/barim/OneDrive/Desktop/CARLA_0.9.15/WindowsNoEditor/Co-Simulation/Sumo/vehicles_data.json.lock'):
         with open('C:/Users/barim/OneDrive/Desktop/CARLA_0.9.15/WindowsNoEditor/Co-Simulation/Sumo/vehicles_data.json') as f:
@@ -20,20 +19,19 @@ def load_data():
 
 # Funzione per aggiornare i dati e visualizzare le metriche
 def update_metrics(veicolo_selezionato):
-    # Visualizza velocità e accelerazione
     col1, col2 = st.columns(2)
     
     with col1:
-        st.metric(label="Velocity", value=f"{round(veicolo_selezionato['speed'].values[0], 2)} m/s")
-        st.metric(label="Acceleration", value=f"{round(veicolo_selezionato['acceleration'].values[0], 2)} m/s²")
+        st.metric(label="Velocità", value=f"{round(veicolo_selezionato['speed'].values[0], 2)} m/s")
+        st.metric(label="Accelerazione", value=f"{round(veicolo_selezionato['acceleration'].values[0], 2)} m/s²")
     
     with col2:
-        st.write("**Angle:**", round(veicolo_selezionato['angle'].values[0], 2))
-        st.write("**Road ID:**", veicolo_selezionato['lane_id'].values[0])
+        st.write("**Angolo:**", round(veicolo_selezionato['angle'].values[0], 2))
+        st.write("**ID corsia:**", veicolo_selezionato['lane_id'].values[0])
 
 # Funzione per visualizzare le nuove metriche
 def update_additional_metrics(veicolo_selezionato):
-    st.write("### Emissions & Consuptions")
+    st.write("### Emissions & Consumptions")
     row1_col1, row1_col2, row1_col3 = st.columns(3)
     row2_col1, row2_col2, row2_col3 = st.columns(3)
     
@@ -45,11 +43,22 @@ def update_additional_metrics(veicolo_selezionato):
         st.write("**PM Emission:**", round(veicolo_selezionato['pm_emission'].values[0], 2), "**mg/s**")
     
     with row2_col1:
-        st.write("**Electic Consuption:**", round(veicolo_selezionato['electricity_consumption'].values[0], 2), "**Wh/s**")
+        st.write("**Electric Consumption:**", round(veicolo_selezionato['electricity_consumption'].values[0], 2), "**Wh/s**")
     with row2_col2:
-        st.write("**Fuel Consuption:**", round(veicolo_selezionato['fuel_consumption'].values[0], 2), "**mg/s**")
+        st.write("**Fuel Consumption:**", round(veicolo_selezionato['fuel_consumption'].values[0], 2), "**mg/s**")
     with row2_col3:
         st.write("**Noise:**", round(veicolo_selezionato['noise'].values[0], 2),"**dB**")
+
+# Funzione per calcolare le metriche aggregate
+def aggregate_metrics(data):
+    total_co2 = data['co2_emission'].sum()
+    total_co = data['co_emission'].sum()
+    total_pm = data['pm_emission'].sum()
+    avg_speed = data['speed'].mean()
+    total_fuel_consumption = data['fuel_consumption'].sum()
+    total_electricity_consumption = data['electricity_consumption'].sum()
+    
+    return total_co2, total_co, total_pm, avg_speed, total_fuel_consumption, total_electricity_consumption
 
 # Carica i dati
 data = load_data()
@@ -59,13 +68,32 @@ st.title('Vehicles Watcher')
 # 2. Mantieni l'ultimo ID selezionato
 if 'last_selected' not in st.session_state:
     st.session_state.last_selected = data['id'].tolist()[0]
-
-# 3. Creare il menù a tendina con gli ID veicoli
+    
+st.write("### Vehicles' IDs: ")
+# Mostra gli ID veicoli con uno sfondo colorato
 id_veicoli = data['id'].tolist()
-selezionato = st.selectbox('Select the vehicle ID:', id_veicoli, index=id_veicoli.index(st.session_state.last_selected))
+
+# Sezione scrollante per gli ID
+with st.container():
+    st.markdown(
+        """
+        <div style="background-color: #262730; padding: 8px; border-radius: 7px; padding-bottom: 0px; padding-top: 5px">
+            <marquee scrollamount="6" direction="left" behavior="scroll">
+                <span style="color: #149e3b;">{}</span>
+            </marquee>
+        </div>
+        """.format(" &nbsp&nbsp | &nbsp&nbsp ".join(id_veicoli)),
+        unsafe_allow_html=True
+    )
+
+# Casella di testo per l'ID veicolo
+input_id = st.text_input("ID del veicolo", placeholder="Enter vehicle's ID", label_visibility='hidden')
 
 # Aggiorna la selezione memorizzata
-st.session_state.last_selected = selezionato
+if input_id in id_veicoli:
+    st.session_state.last_selected = input_id
+else:
+    st.session_state.last_selected = data['id'].tolist()[0]
 
 # Percorso della cartella immagini
 image_folder = 'images'
@@ -79,10 +107,10 @@ while True:
     id_veicoli = data['id'].tolist()
 
     # Trova i dati del veicolo selezionato
-    veicolo_selezionato = data[data['id'] == selezionato]
+    veicolo_selezionato = data[data['id'] == st.session_state.last_selected]
 
     if not veicolo_selezionato.empty:
-        st.subheader('Selected vehicle info:')
+        st.subheader('Dettagli veicolo selezionato:')
         
         # Recupera il tipo di veicolo
         vehicle_type = veicolo_selezionato['type'].values[0]
@@ -105,6 +133,31 @@ while True:
         # Nuova riga per le nuove metriche
         st.write("---")  # Linea orizzontale per separare le sezioni
         update_additional_metrics(veicolo_selezionato)
+
+        # Mostra le metriche aggregate
+        total_co2, total_co, total_pm, avg_speed, total_fuel_consumption, total_electricity_consumption = aggregate_metrics(data)
+
+        st.write("### Aggregate Metrics")
+        col1, col2, col3 = st.columns(3)
+
+        with col1:
+            st.write("**CO2 Emission:**", round(total_co2, 2), "**mg/s**")
+        with col2:
+            st.write("**CO Emission:**", round(total_co, 2), "**mg/s**")
+        with col3:
+            st.write("**PM Emission:**", round(total_pm, 2), "**mg/s**")
+        
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            st.write("**Fuel Consumption:**", round(total_fuel_consumption, 2), "**mg/s**")
+        
+        with col2:
+            st.write("**Electric Consumption:**", round(total_electricity_consumption, 2), "**mg/s**")
+
+        st.write("---")  # Linea orizzontale per separare le sezioni
+        st.write("### Average Speed")
+        st.write("**Average Speed:**", round(avg_speed, 2), "**m/s**")
         
     else:
         st.write('Nessun veicolo trovato con questo ID.')
