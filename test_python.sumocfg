@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <input>
+        <net-file value="cityFiles/Bari.net.xml"/>
+        <route-files value="carlaUtils/carlavtypes.rou.xml, cityFiles/modified_traffic.rou.xml"/>
+    </input>
+	 
+    <gui_only>
+        <gui-settings-file value="carlaUtils/viewsettings.xml"/>
+    </gui_only>
+</configuration>
