@@ -25,3 +25,10 @@ This scipt is to be used instead of the already developed run_synchronization.py
 2. [Not necessary] **Modify** the camera_with_tk.py script in the *camera* folder so that the path saved in the variable `json_file_path` is the absolute path to the run_syncro.py script just moved.
 
 # Description
+In this section, a guide to build a traffic digital twin of your city will be explained step by step.
+1. Go to [OpenStreetMap](https://www.openstreetmap.org/) 
+
+
+
+
+
