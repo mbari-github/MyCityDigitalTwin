@@ -50,7 +50,17 @@ In this section, a guide to build a traffic digital twin of your city will be ex
 
 
 5. Once you are done with this **CARLA**'s side of the creation phase, we need to focus on the **sumo**'s side. For **sumo**, you need to build a configuration file (the *sumocfg* in the repository). Opening this file, it's understandable that 2 more files are needed to compile a functioning code. There are **4 files** in the *config* file: the `viewsettings.xml` and the `carlavtypes.rou.xml`, both in the *carlaUtils* folder in this repository, no need to modify them, and then the **net** and the **traffic** file (in this project, `Bari.net.xml` and `modified_traffic.rou.xml`, respectively)
-    - **Net file**: move to CARLA_x.x.x\Co-Simulation\Sumo\util directory and then use the command: <br/> `netconvert_carla.py --output OUTPUT xodr_file` <br/> Then move the result in the same directory of the *sumocfg* file, or in an accessible directory from there.
+    - **Net file**: move to *CARLA_x.x.x\Co-Simulation\Sumo\util* directory and then use the command: <br/> `netconvert_carla.py --output OUTPUT xodr_file` <br/> Then move the result in the same directory  
+      of the *sumocfg* file, or in an accessible directory from there.
+    - **Traffic file**: There may be a logic behind the generation of the traffic in a given scenario, but in this case a random generation logic is adopted. <br/>
+       The path's generation of each vehicle is done using a **sumo**'s script (it's recommended to use --help to see every option in this command): <br/>
+      `python randomTrips.py -n yourCity.net.xml -r yourGeneratedTraffic.rou.xml --end N  --insertion-density N` <br/>
+      Then, it's added to every vehicle the *type* attribute using the modifyXML.py script <br/>
+      `python modifyXML.py  --xml yourGeneratedTraffic.rou.xml` <br/>
+      This last script returns a new file `modified_yourGeneratedTraffic.rou.xml`, that will be used in the *sumocfg* file.
+      
+      
+   
    
       
    
