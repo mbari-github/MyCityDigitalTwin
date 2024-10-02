@@ -26,7 +26,8 @@ This scipt is to be used instead of the already developed run_synchronization.py
 
 # Description
 In this section, a guide to build a traffic digital twin of your city will be explained step by step.
-1. Go to [OpenStreetMap](https://www.openstreetmap.org/) 
+1. Go to [OpenStreetMap](https://www.openstreetmap.org/), go to the export tab and select a proper area to work with. Just make sure it's not to big, else it might create lag in the next steps where the ctual 3D model will be used.
+2. 
 
 
 
