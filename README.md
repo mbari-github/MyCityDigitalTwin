@@ -4,7 +4,7 @@
 
 # Table of Contents
 - [Installation](#installation)
-- [Description&Usage](#description&usage)
+- [Description](#description)
 - [Contributing](#contributing)
 - [License](#license)
 
@@ -24,4 +24,4 @@ Once **CARLA** and the **conda env** are properly set, the repository is usable.
 This scipt is to be used instead of the already developed run_synchronization.py in that folder.
 2. [Not necessary] **Modify** the camera_with_tk.py script in the *camera* folder so that the path saved in the variable `json_file_path` is the absolute path to the run_syncro.py script just moved.
 
-#Description&Usage
+# Description
