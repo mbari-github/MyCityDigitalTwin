@@ -57,7 +57,7 @@ In this section, a guide to build a traffic digital twin of your city will be ex
       `python randomTrips.py -n yourCity.net.xml -r yourGeneratedTraffic.rou.xml --end N  --insertion-density N` <br/>
       Then, it's added to every vehicle the *type* attribute using the modifyXML.py script <br/>
       `python modifyXML.py  --xml yourGeneratedTraffic.rou.xml` <br/>
-      This last script returns a new file `modified_yourGeneratedTraffic.rou.xml`, that will be used in the *sumocfg* file.
+      This last script returns a new file, modified_yourGeneratedTraffic.rou.xml, that will be used in the *sumocfg* file.
       
       
    
