@@ -38,7 +38,7 @@ In this section, a guide to build a traffic digital twin of your city will be ex
     - If you downloaded the **CARLA** folder, the osm_to_xodr.py script may returns errors so it's recommended to use a different method for the conversion. For this application case, we advice an already- 
       developed python library, [osm2xodr](https://github.com/JHMeusener/osm2xodr), made by JHMeusenerbr. <br/>
  
- 2 1/2. Once the *xodr* file is obtained, it's highly recommeded to double-check the result. There are 2 simple ways:
+ $2^{1/2}$. Once the *xodr* file is obtained, it's highly recommeded to double-check the result. There are 2 simple ways:
     - Use the validateXML.py script in UTILS, and it could eventually find errors in the syntax of the file (there are simbols that are not critically damaging in a *osm* file, but they are in the *xodr*, 
       e.g. &)
     - Use [odrviewer](https://odrviewer.io/), a software that let the user see a 3D version of the generated *xodr* file. From that web page, it's possible to reach the github page of the creator. 
