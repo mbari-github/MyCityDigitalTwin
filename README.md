@@ -30,7 +30,9 @@ In this section, a guide to build a traffic digital twin of your city will be ex
 2. Then convert the *osm* file in a *xodr* file. This operation can be done in 2 different ways depending on how **CARLA** was downloaded:
     - If you downloaded the devs' version, use the osm_to_xodr.py script in the *carla-dev\PythonAPI\util* folder.<br/>
       `python osm_to_xodr.py -i OSM_FILE_PATH  -o XODR_FILE_PATH  --traffic-lights  --center-map` <br/>
-      In case this returns an error, just follow the  
+      In case this returns an error, just follow the other oint.
+    - If you downloaded the **CARLA** folder, the osm_to_xodr.py script may returns errors so it's recommended to use a different method for the conversion. In our case, we advice an already-developed python 
+      library, [osm2xodr](https://github.com/JHMeusener/osm2xodr)
 
 
 
