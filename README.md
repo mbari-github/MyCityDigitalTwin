@@ -10,7 +10,7 @@
 
 # Installation
  > [!IMPORTANT]
-> Before starting to download and use this repository, it's mandatory to download [**CARLA**](https://carla.readthedocs.io/en/latest/download/) and set up a [**conda environment**](https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html) using the yml file. Once the conda terminal is open: <br/><br/>
+> Before starting to download and use this repository, it's mandatory to download [**CARLA**](https://carla.readthedocs.io/en/latest/download/) and set up a [**conda environment**](https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html) using the *yml* file. Once the conda terminal is open: <br/><br/>
 >`conda env create -f environment.yml`
 
 > [!WARNING]
@@ -26,8 +26,11 @@ This scipt is to be used instead of the already developed run_synchronization.py
 
 # Description
 In this section, a guide to build a traffic digital twin of your city will be explained step by step.
-1. Go to [OpenStreetMap](https://www.openstreetmap.org/), go to the export tab and select a proper area to work with. Just make sure it's not to big, else it might create lag in the next steps where the ctual 3D model will be used.
-2. 
+1. Go to [OpenStreetMap](https://www.openstreetmap.org/), go to the export tab and select a proper area to work with. Just make sure it's not to big, else it might create lag in the next steps where the actual 3D model will be used.
+2. Then convert the *osm* file in a *xodr* file. This operation can be done in 2 different ways depending on how **CARLA** was downloaded:
+    - If you downloaded the devs' version, use the osm_to_xodr.py script in the *carla-dev\PythonAPI\util* folder.<br/>
+      `python osm_to_xodr.py -i OSM_FILE_PATH  -o XODR_FILE_PATH  --traffic-lights  --center-map` <br/>
+      In case this returns an error, just follow the  
 
 
 
