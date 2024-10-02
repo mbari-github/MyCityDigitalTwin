@@ -25,14 +25,15 @@ This scipt is to be used instead of the already developed run_synchronization.py
 2. [Not necessary] **Modify** the camera_with_tk.py script in the *camera* folder so that the path saved in the variable `json_file_path` is the absolute path to the run_syncro.py script just moved.
 
 # Description
-In this section, a guide to build a traffic digital twin of your city will be explained step by step.
-1. Go to [OpenStreetMap](https://www.openstreetmap.org/), go to the export tab and select a proper area to work with. Just make sure it's not to big, else it might create lag in the next steps where the actual 3D model will be used.
+In this section, a guide to build a traffic digital twin of your city will be explained step by step.<br/><br/>
+1. Go to [OpenStreetMap](https://www.openstreetmap.org/), go to the export tab and select a proper area to work with. Just make sure it's not to big, else it might create lag in the next steps where the  
+   actual 3D model will be used.<br/>
 2. Then convert the *osm* file in a *xodr* file. This operation can be done in 2 different ways depending on how **CARLA** was downloaded:
     - If you downloaded the devs' version, use the osm_to_xodr.py script in the *carla-dev\PythonAPI\util* folder.<br/>
       `python osm_to_xodr.py -i OSM_FILE_PATH  -o XODR_FILE_PATH  --traffic-lights  --center-map` <br/>
-      In case this returns an error, just follow the other oint.
-    - If you downloaded the **CARLA** folder, the osm_to_xodr.py script may returns errors so it's recommended to use a different method for the conversion. In our case, we advice an already-developed python 
-      library, [osm2xodr](https://github.com/JHMeusener/osm2xodr)
+      In case this returns an error, just follow the other point.<br/>
+    - If you downloaded the **CARLA** folder, the osm_to_xodr.py script may returns errors so it's recommended to use a different method for the conversion. In our case, we advice an already-developed   
+      python library, [osm2xodr](https://github.com/JHMeusener/osm2xodr)
 
 
 
