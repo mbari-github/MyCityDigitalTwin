@@ -23,3 +23,5 @@ Once **CARLA** and the **conda env** are properly set, the repository is usable.
 1. **Move** the run_syncro.py script from the *Co-Simulation-Sumo* folder to the **CARLA** directory just downloaded: the path is something like CARLA_x.x.x/Co-Simulation/Sumo. <br/>
 This scipt is to be used instead of the already developed run_synchronization.py in that folder.
 2. [Not necessary] **Modify** the camera_with_tk.py script in the *camera* folder so that the path saved in the variable `json_file_path` is the absolute path to the run_syncro.py script just moved.
+
+#Description&Usage
