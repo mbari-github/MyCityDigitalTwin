@@ -10,7 +10,10 @@
 
 # Installation
  > [!IMPORTANT]
-> Before starting to download and use this repository, it's mandatory to download [**CARLA**](https://carla.readthedocs.io/en/latest/download/) and set up a [**conda environment**](https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html) using the *yml* file. Once the conda terminal is open: <br/><br/>
+> In this page, we will discuss the process in a Windows PC.
+
+ > [!IMPORTANT]
+> Before starting to download and use this repository, it's mandatory to download [**CARLA**](https://carla.readthedocs.io/en/latest/download/), [**sumo**](https://sumo.dlr.de/docs/Downloads.php) and set up a [**conda environment**](https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html) using the *yml* file. Once the conda terminal is open: <br/><br/>
 >`conda env create -f environment.yml`
 
 > [!WARNING]
@@ -32,8 +35,10 @@ In this section, a guide to build a traffic digital twin of your city will be ex
     - If you downloaded the devs' version, use the osm_to_xodr.py script in the *carla-dev\PythonAPI\util* folder.<br/>
       `python osm_to_xodr.py -i OSM_FILE_PATH  -o XODR_FILE_PATH  --traffic-lights  --center-map` <br/>
       In case this returns an error, just follow the other point.<br/>
-    - If you downloaded the **CARLA** folder, the osm_to_xodr.py script may returns errors so it's recommended to use a different method for the conversion. In our case, we advice an already-developed   
-      python library, [osm2xodr](https://github.com/JHMeusener/osm2xodr)
+    - If you downloaded the **CARLA** folder, the osm_to_xodr.py script may returns errors so it's recommended to use a different method for the conversion. For this application case, we advice an already- 
+      developed python library, [osm2xodr](https://github.com/JHMeusener/osm2xodr), made by JHMeusenerbr. <br/>
+ 
+ 3. 
 
 
 
