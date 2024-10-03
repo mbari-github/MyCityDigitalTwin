@@ -10,7 +10,10 @@
 
 # Installation
  > [!IMPORTANT]
-> Before starting to download and use this repository, it's mandatory to download [**CARLA**](https://carla.readthedocs.io/en/latest/download/) and set up a [**conda environment**](https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html) using the *yml* file. Once the conda terminal is open: <br/><br/>
+> In this page, we will discuss the process in a Windows PC.
+
+ > [!IMPORTANT]
+> Before starting to download and use this repository, it's mandatory to download [**CARLA**](https://carla.readthedocs.io/en/latest/download/), [**sumo**](https://sumo.dlr.de/docs/Downloads.php) and set up a [**conda environment**](https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html) using the *yml* file. Once the conda terminal is open: <br/><br/>
 >`conda env create -f environment.yml`
 
 > [!WARNING]
@@ -25,14 +28,42 @@ This scipt is to be used instead of the already developed run_synchronization.py
 2. [Not necessary] **Modify** the camera_with_tk.py script in the *camera* folder so that the path saved in the variable `json_file_path` is the absolute path to the run_syncro.py script just moved.
 
 # Description
-In this section, a guide to build a traffic digital twin of your city will be explained step by step.
-1. Go to [OpenStreetMap](https://www.openstreetmap.org/), go to the export tab and select a proper area to work with. Just make sure it's not to big, else it might create lag in the next steps where the actual 3D model will be used.
+In this section, a guide to build a traffic digital twin of your city will be explained step by step.<br/><br/>
+1. Go to [OpenStreetMap](https://www.openstreetmap.org/), go to the export tab and select a proper area to work with. Just make sure it's not to big, else it might create lag in the next steps where the  
+   actual 3D model will be used.<br/>
+   
 2. Then convert the *osm* file in a *xodr* file. This operation can be done in 2 different ways depending on how **CARLA** was downloaded:
     - If you downloaded the devs' version, use the osm_to_xodr.py script in the *carla-dev\PythonAPI\util* folder.<br/>
       `python osm_to_xodr.py -i OSM_FILE_PATH  -o XODR_FILE_PATH  --traffic-lights  --center-map` <br/>
-      In case this returns an error, just follow the other oint.
-    - If you downloaded the **CARLA** folder, the osm_to_xodr.py script may returns errors so it's recommended to use a different method for the conversion. In our case, we advice an already-developed python 
-      library, [osm2xodr](https://github.com/JHMeusener/osm2xodr)
+      In case this returns an error, just follow the other point.<br/>
+    - If you downloaded the **CARLA** folder, the osm_to_xodr.py script may returns errors so it's recommended to use a different method for the conversion. For this application case, we advice an already- 
+      developed python library, [osm2xodr](https://github.com/JHMeusener/osm2xodr), made by JHMeusenerbr. <br/>
+ 
+3. Once the *xodr* file is obtained, it's highly recommeded to double-check the result. There are 2 simple ways:
+    - Use the validateXML.py script in UTILS, and it could eventually find errors in the syntax of the file (there are simbols that are not critically damaging in a *osm* file, but they are in the *xodr*, 
+      e.g. "&")
+    - Use [odrviewer](https://odrviewer.io/), a software that let the user see a 3D version of the generated *xodr* file. From that web page, it's possible to reach the github page of the creator.
+   If the *xodr* file is well formatted, there are 2 ways to procede: you can already do the **CARLA** simulation with just the road network (skip to step #NUMERO) or you can already build the city's  
+   buildings.
+
+4. SPIEGAZIONE DI BLENDER E DI UE4 EDITOR
+
+
+5. Once you are done with this **CARLA**'s side of the creation phase, we need to focus on the **sumo**'s side. For **sumo**, you need to build a configuration file (the *sumocfg* in the repository). Opening this file, it's understandable that 2 more files are needed to compile a functioning code. There are **4 files** in the *config* file: the `viewsettings.xml` and the `carlavtypes.rou.xml`, both in the *carlaUtils* folder in this repository, no need to modify them, and then the **net** and the **traffic** file (in this project, `Bari.net.xml` and `modified_traffic.rou.xml`, respectively)
+    - **Net file**: move to *CARLA_x.x.x\Co-Simulation\Sumo\util* directory and then use the command: <br/> `netconvert_carla.py --output OUTPUT xodr_file` <br/> Then move the result in the same directory  
+      of the *sumocfg* file, or in an accessible directory from there.
+    - **Traffic file**: There may be a logic behind the generation of the traffic in a given scenario, but in this case a random generation logic is adopted. <br/>
+       The path's generation of each vehicle is done using a **sumo**'s script (it's recommended to use --help to see every option in this command): <br/>
+      `python randomTrips.py -n yourCity.net.xml -r yourGeneratedTraffic.rou.xml --end N  --insertion-density N` <br/>
+      Then, it's added to every vehicle the *type* attribute using the modifyXML.py script <br/>
+      `python modifyXML.py  --xml yourGeneratedTraffic.rou.xml` <br/>
+      This last script returns a new file, modified_yourGeneratedTraffic.rou.xml, that will be used in the *sumocfg* file.
+      
+      
+   
+   
+      
+   
 
 
 
