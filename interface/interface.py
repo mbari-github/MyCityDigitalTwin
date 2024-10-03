@@ -125,7 +125,7 @@ while True:
         
         with col_img:
             if os.path.exists(image_path):
-                st.image(image_path, caption=vehicle_type)
+                st.image(image_path, caption=vehicle_type, use_column_width ="auto" )
             else:
                 st.write(f"**Model:** {vehicle_type} (Image not found)")
         
