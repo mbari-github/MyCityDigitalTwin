@@ -89,6 +89,9 @@ In this section, all the already-developed software used in this project will be
 - [osm2xodr](https://github.com/JHMeusener/osm2xodr)
 - [odrviewer](https://odrviewer.io/)
 
+
+# License
+This is a open-source project for a university project, so it's ok to use this code however needed, just look up for the licence of every already-developed software used.
     
      
                   
