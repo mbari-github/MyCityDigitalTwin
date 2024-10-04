@@ -70,7 +70,7 @@ In this section, a guide to build a traffic digital twin of your city will be ex
      From the **conda** terminal, move to CARLA_x.x.x\Co-Simulation\Sumo and then use:
      `python run_syncro.py --tls-manager sumo --sync-vehicle-all  --sumo-gui   --debug "path/to/file.sumocfg" `<br/>
 
-     This command opens a sumo gui with the road network. From the gui, it's possible to adjust additional set-ups, and once everything is ready, use the start button on the gui to initiate the actual 
+     This command opens a sumo gui with the road network. From the gui, it's possible to adjust additional settings, and once everything is ready, use the start button on the gui to initiate the actual 
      simulation.
 
   7. The simulation is on-going and there are different things the user can do:
