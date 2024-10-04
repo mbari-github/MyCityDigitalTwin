@@ -58,6 +58,23 @@ In this section, a guide to build a traffic digital twin of your city will be ex
       Then, it's added to every vehicle the *type* attribute using the modifyXML.py script <br/>
       `python modifyXML.py  --xml yourGeneratedTraffic.rou.xml` <br/>
       This last script returns a new file, modified_yourGeneratedTraffic.rou.xml, that will be used in the *sumocfg* file.
+
+  6. Once everything is done and functioning, it's time to start the co-simulation. First open the **conda** terminal, activate the environment and go to the **CARLA** downloaded folder. <br/>
+     To start a **CARLA** server, use: <br/>
+     `CarlaUE4.exe [--dx11] [--Graphic=Low] path/to/Carla/map` <br/>
+     It's not necessary to specify now the path to the map that is going to use, but of course this speeds up the process. If the map was not specified, the config.py script in CARLA_x.x.x\PythonAPI\util 
+     folder. This script is fundamental if the simulation is done only with the road network in *xodr* format. <br/>
+     `python config.py [-m MAP] [--rendering] [--no-rendering] [--no-sync] [-i]  [-x XODR_FILE_PATH] [--osm-path OSM_FILE_PATH]` <br/>
+     There are a lot of usefull functions in this script, so it's recommended to go look at them. <br/>
+     Once the map is loaded in **CARLA**, the co-simulation can be initiated:
+     From the **conda** terminal, move to CARLA_x.x.x\Co-Simulation\Sumo and then use:
+     `python run_syncro.py --tls-manager sumo --sync-vehicle-all  --sumo-gui  --debug "path/to/file.sumocfg"` <br/>
+     `--sync-vehicle-all` synchronize all vehicle properties (default: False)  `--tls-manager {none,sumo,carla}` select traffic light manager (default: none)<br/>
+     `--debug`               enable debug messages
+     
+                  
+     
+     
       
       
    
