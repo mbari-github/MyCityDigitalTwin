@@ -86,7 +86,8 @@ In this section, all the already-developed software used in this project will be
 - [CARLA 0.9.15](https://carla.org/2023/11/10/release-0.9.15/)
 - [sumo 1.20](https://sumo.dlr.de/docs/Downloads.php)
 - [miniconda](https://docs.anaconda.com/miniconda/)
-
+- [osm2xodr](https://github.com/JHMeusener/osm2xodr)
+- [odrviewer](https://odrviewer.io/)
 
     
      
