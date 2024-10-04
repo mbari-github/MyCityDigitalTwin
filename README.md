@@ -68,16 +68,19 @@ In this section, a guide to build a traffic digital twin of your city will be ex
      There are a lot of usefull functions in this script, so it's recommended to go look at them. <br/>
      Once the map is loaded in **CARLA**, the co-simulation can be initiated:
      From the **conda** terminal, move to CARLA_x.x.x\Co-Simulation\Sumo and then use:
-     `python run_syncro.py --tls-manager sumo --sync-vehicle-all  --sumo-gui   --debug "path/to/file.sumocfg" <br/>`
+     `python run_syncro.py --tls-manager sumo --sync-vehicle-all  --sumo-gui   --debug "path/to/file.sumocfg" `<br/>
 
-     ```
-     
-     --sync-vehicle-all` synchronize all vehicle properties (default: False)
-     --tls-manager {none,sumo,carla}` select traffic light manager (default: none)<br/>
-     --debug               enable debug messages
-     
+     This command opens a sumo gui with the road network. From the gui, it's possible to adjust additional set-ups, and once everything is ready, use the start button on the gui to initiate the actual 
+     simulation.
 
-     ```
+  7. The simulation is on-going and there are different things the user can do:
+     - Use the 2 different camera scripts to follow the vehicles in the simulation. The camera.py script follows random vehicles everything the ENTER BUTTON is pressed. The other one needs a parameter in 
+       input with --id, the camera is going to follow that vehicle and in a tk widget is going to show the basic info of that vehicle.
+     - Open up the interface to look up all info of every vehicle in the simulation. From the conda terminal go to the interface folder and then use: <br/>
+     `streamlit run interface.py` <br/>
+     This will use your default browser to show the localhosted app, and from there it's possible to watch a lot of usefull info about the simulation.
+
+
     
      
                   
