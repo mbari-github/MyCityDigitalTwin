@@ -81,6 +81,13 @@ In this section, a guide to build a traffic digital twin of your city will be ex
      This will use your default browser to show the localhosted app, and from there it's possible to watch a lot of usefull info about the simulation.
 
 
+# Contributing
+In this section, all the already-developed software used in this project will be listed:
+- [CARLA 0.9.15](https://carla.org/2023/11/10/release-0.9.15/)
+- [sumo 1.20](https://sumo.dlr.de/docs/Downloads.php)
+- [miniconda](https://docs.anaconda.com/miniconda/)
+
+
     
      
                   
