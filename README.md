@@ -83,23 +83,25 @@ This section provides a step-by-step guide to creating a traffic digital twin of
    ```bash
    CarlaUE4.exe [--dx11] [--quality-level=Low] path/to/Carla/map
    ```
-     It's not necessary to specify now the path to the map that is going to use, but of course this speeds up the process. If the map was not specified, the config.py script in CARLA_x.x.x\PythonAPI\util 
-     folder. This script is fundamental if the simulation is done only with the road network in *xodr* format. <br/>
-     `python config.py [-m MAP] [--rendering] [--no-rendering] [--no-sync] [-i]  [-x XODR_FILE_PATH] [--osm-path OSM_FILE_PATH]` <br/>
-     There are a lot of usefull functions in this script, so it's recommended to go look at them. <br/>
-     Once the map is loaded in **CARLA**, the co-simulation can be initiated:
-     From the **conda** terminal, move to CARLA_x.x.x\Co-Simulation\Sumo and then use:
-     `python run_syncro.py --tls-manager sumo --sync-vehicle-all  --sumo-gui   --debug "path/to/file.sumocfg" `<br/>
+   This script has many useful functions, so it's recommended to explore them.
 
-     This command opens a sumo gui with the road network. From the gui, it's possible to adjust additional settings, and once everything is ready, use the start button on the gui to initiate the actual 
-     simulation.
+   Once the map is loaded into **CARLA**, the co-simulation can begin. From the **conda** terminal, navigate to `CARLA_x.x.x/Co-Simulation/Sumo` and run the following command:
 
-  7. The simulation is on-going and there are different things the user can do:
-     - Use the 2 different camera scripts to follow the vehicles in the simulation. The camera.py script follows random vehicles everything the ENTER BUTTON is pressed. The other one needs a parameter in 
-       input with --id, the camera is going to follow that vehicle and in a tk widget is going to show the basic info of that vehicle.
-     - Open up the interface to look up all info of every vehicle in the simulation. From the conda terminal go to the interface folder and then use: <br/>
-     `streamlit run interface.py` <br/>
-     This will use your default browser to show the localhosted app, and from there it's possible to watch a lot of usefull info about the simulation.
+    ```bash
+    python run_syncro.py --tls-manager sumo --sync-vehicle-all --sumo-gui --debug "path/to/file.sumocfg"
+    ```
+    This command opens a **SUMO** GUI displaying the road network. From the GUI, you can adjust additional settings. Once everything is ready, press the start button on the GUI to begin the simulation.
+
+7. Once the co-simulation is running, several options are available:
+    
+    - Use two different camera scripts to follow vehicles in the simulation. The `camera.py` script randomly follows vehicles each time the ENTER key is pressed. The other script requires an input parameter `--id`, which follows a specific vehicle,             displaying basic info in a Tkinter widget.
+    
+    - Open the interface to monitor all vehicles in the simulation. From the conda terminal, navigate to the interface folder and run:
+    
+    ```bash
+    streamlit run interface.py
+    ```
+    This will open your default browser and show a locally hosted app where you can monitor detailed information about the ongoing simulation.
 
 
 # Contributing
