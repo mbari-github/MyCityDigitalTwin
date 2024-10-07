@@ -40,6 +40,9 @@ This scipt is to be used instead of the already developed run_synchronization.py
 
 This section provides a step-by-step guide to creating a traffic digital twin of your city.
 
+
+![schema](https://github.com/user-attachments/assets/197a07dd-3476-4e78-b725-5aa8d7c2b32b)
+
 1. Go to [OpenStreetMap](https://www.openstreetmap.org/), navigate to the **Export** tab, and select an appropriate area to work with. Ensure the selected area is not too large, as this could lead to performance issues when using the 3D model.
 
 2. Convert the downloaded *OSM* file into an *XODR* file. There are two ways to perform this conversion depending on your **CARLA** installation:
