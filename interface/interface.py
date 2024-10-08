@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+import numpy as np
 import json
 import os
 import time
@@ -44,14 +45,43 @@ def aggregate_metrics(data):
     total_co2 = data['co2_emission'].sum()
     total_co = data['co_emission'].sum()
     total_pm = data['pm_emission'].sum()
-    avg_speed = data['speed'].mean()
     total_fuel_consumption = data['fuel_consumption'].sum()
     total_electricity_consumption = data['electricity_consumption'].sum()
     
-    return total_co2, total_co, total_pm, avg_speed, total_fuel_consumption, total_electricity_consumption
+    return total_co2, total_co, total_pm, total_fuel_consumption, total_electricity_consumption
+
+
+# Funzione per calcolare la velocità media
+def calculate_speed_metrics(data, veicolo_selezionato):
+    # Velocità media del veicolo selezionato durante l'intera simulazione
+    speed_selected = veicolo_selezionato['speed'].values[0]
+    avg_speed_selected = sum(speed_selected) / len(speed_selected)
+    
+    # Velocità media di tutti i veicoli nell'ultimo istante
+    last_speeds = [vehicle['speed'][-1] for _, vehicle in data.iterrows() if vehicle['speed']]
+    avg_last_speed_all = sum(last_speeds) / len(last_speeds) if last_speeds else 0
+    
+    # Velocità media di tutti i veicoli durante l'intera simulazione
+    all_speeds = [sum(vehicle['speed']) / len(vehicle['speed']) for _, vehicle in data.iterrows() if vehicle['speed']]
+    avg_speed_all = sum(all_speeds) / len(all_speeds) if all_speeds else 0
+    
+    # Memorizza i valori storici
+    avg_speed_selected_history.append(avg_speed_selected)
+    avg_last_speed_all_history.append(avg_last_speed_all)
+    avg_speed_all_history.append(avg_speed_all)
+    
+    return avg_speed_selected, avg_last_speed_all, avg_speed_all
+
+
+
 
 # Carica i dati
 data = load_data()
+
+avg_speed_selected_history = []
+avg_last_speed_all_history = []
+avg_speed_all_history = []
+
 
 st.title('Vehicles Watcher')
 
@@ -113,8 +143,11 @@ while True:
         co2_emission, co_emission, pm_emission, electricity_consumption, fuel_consuption, noise = update_additional_metrics(veicolo_selezionato)
         
         # Aggiorna le metriche aggregate
-        total_co2, total_co, total_pm, avg_speed, total_fuel_consumption, total_electricity_consumption = aggregate_metrics(data)
+        total_co2, total_co, total_pm, total_fuel_consumption, total_electricity_consumption = aggregate_metrics(data)
         
+        #Aggiorna le info su velocità medie
+        avg_speed_selected, avg_last_speed_all, avg_speed_all = calculate_speed_metrics(data, veicolo_selezionato)
+
         
         
         # Costruisce il percorso dell'immagine
@@ -133,7 +166,7 @@ while True:
             col1, col2 = st.columns(2)
     
             with col1:
-                st.metric(label="Velocity", value=f"{round(speed, 2)} m/s")
+                st.metric(label="Velocity", value=f"{round(speed[-1], 2)} m/s")
                 st.metric(label="Acceleration", value=f"{round(acceleration , 2)} m/s²")
             
             with col2:
@@ -146,48 +179,50 @@ while True:
         # Nuova riga per le nuove metriche
         st.write("---")  # Linea orizzontale per separare le sezioni
         st.write("### Emissions & Consumptions")
-        row1_col1, row1_col2, row1_col3 = st.columns(3)
-        row2_col1, row2_col2, row2_col3 = st.columns(3)
+        row1_col1, row1_col2 = st.columns(2)
+        row2_col1, row2_col2 = st.columns(2)
+        row3_col1, row3_col2 = st.columns(2)
         
         with row1_col1:
             st.write("**CO2 Emission:**", round(co2_emission, 2), "**mg/s**")
         with row1_col2:
             st.write("**CO Emission:**", round(co_emission, 2), "**mg/s**")
-        with row1_col3:
-            st.write("**PM Emission:**", round(pm_emission, 2), "**mg/s**")
-        
         with row2_col1:
-            st.write("**Electric Consumption:**", round(electricity_consumption, 2), "**Wh/s**")
+            st.write("**PM Emission:**", round(pm_emission, 2), "**mg/s**")
         with row2_col2:
-            st.write("**Fuel Consumption:**", round(fuel_consuption, 2), "**mg/s**")
-        with row2_col3:
             st.write("**Noise:**", round(noise, 2),"**dB**")
-
-        
-
+        with row3_col1:
+            st.write("**Electric Consumption:**", round(electricity_consumption, 2), "**Wh/s**")
+        with row3_col2:
+            st.write("**Fuel Consumption:**", round(fuel_consuption, 2), "**mg/s**")
+    
         
         st.write("---")
         st.write("### Aggregate Metrics")
-        col1, col2, col3 = st.columns(3)
-
-        with col1:
+        row1_col1, row1_col2 = st.columns(2)
+        row2_col1, row2_col2 = st.columns(2)
+        row3_col1, row3_col2 = st.columns(2)
+        
+        with row1_col1:
             st.write("**CO2 Emission:**", round(total_co2, 2), "**mg/s**")
-        with col2:
+        with row1_col2:
             st.write("**CO Emission:**", round(total_co, 2), "**mg/s**")
-        with col3:
-            st.write("**PM Emission:**", round(total_pm, 2), "**mg/s**")
-        
-        col1, col2 = st.columns(2)
-        
-        with col1:
+        with row2_col1:
+            st.write("**PM Emission:**", round(total_pm, 2), "**mg/s**") 
+        with row3_col1:
             st.write("**Fuel Consumption:**", round(total_fuel_consumption, 2), "**mg/s**")
-        
-        with col2:
+        with row3_col2:
             st.write("**Electric Consumption:**", round(total_electricity_consumption, 2), "**Wh/s**")
 
-        st.write("---")  # Linea orizzontale per separare le sezioni
+        # Visualizza le velocità medie
+        st.write("---")
         st.write("### Average Speed")
-        st.write("**Average Speed:**", round(avg_speed, 2), "**m/s**")
+        st.write("**Selected Vehicle Speed (Last Instant):** ", round(speed[-1], 2), "**m/s**")
+        st.write("**Selected Vehicle Average Speed:** ", round(avg_speed_selected, 2), "**m/s**")
+        st.write("**All Vehicles Average Speed (Last Instant):** ", round(avg_last_speed_all, 2), "**m/s**")
+        st.write("**All Vehicles Average Speed (Overall):** ", round(avg_speed_all, 2),  "**m/s**")
+
+        st.line_chart(speed)
         
     else:
         st.write('Nessun veicolo trovato con questo ID.')

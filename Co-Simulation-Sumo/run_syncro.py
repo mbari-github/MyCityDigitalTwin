@@ -129,7 +129,7 @@ class SimulationSynchronization(object):
             carla_blueprint = BridgeHelper.get_carla_blueprint(sumo_actor, self.sync_vehicle_color)
             if carla_blueprint is not None:
                 carla_transform = BridgeHelper.get_carla_transform(sumo_actor.transform,
-                                                                   sumo_actor.extent)
+                                                                sumo_actor.extent)
 
                 carla_actor_id = self.carla.spawn_actor(carla_blueprint, carla_transform)
                 if carla_actor_id != INVALID_ACTOR_ID:
@@ -150,10 +150,10 @@ class SimulationSynchronization(object):
             carla_actor = self.carla.get_actor(carla_actor_id)
 
             carla_transform = BridgeHelper.get_carla_transform(sumo_actor.transform,
-                                                               sumo_actor.extent)
+                                                            sumo_actor.extent)
             if self.sync_vehicle_lights:
                 carla_lights = BridgeHelper.get_carla_lights_state(carla_actor.get_light_state(),
-                                                                   sumo_actor.signals)
+                                                                sumo_actor.signals)
             else:
                 carla_lights = None
 
@@ -199,12 +199,12 @@ class SimulationSynchronization(object):
             sumo_actor = self.sumo.get_actor(sumo_actor_id)
 
             sumo_transform = BridgeHelper.get_sumo_transform(carla_actor.get_transform(),
-                                                             carla_actor.bounding_box.extent)
+                                                            carla_actor.bounding_box.extent)
             if self.sync_vehicle_lights:
                 carla_lights = self.carla.get_actor_light_state(carla_actor_id)
                 if carla_lights is not None:
                     sumo_lights = BridgeHelper.get_sumo_lights_state(sumo_actor.signals,
-                                                                     carla_lights)
+                                                                    carla_lights)
                 else:
                     sumo_lights = None
             else:
@@ -245,33 +245,53 @@ class SimulationSynchronization(object):
                     ElectricityConsumption = traci.vehicle.getElectricityConsumption(vehicle_id)
                     FuelConsumption = traci.vehicle.getFuelConsumption(vehicle_id)
                     NoiseEmission = traci.vehicle.getNoiseEmission(vehicle_id)
-                    
 
-                    self.vehicle_data[carla_actor_id] = {
-                        "type": vehicle_type,
-                        "acceleration": vehicle_acc,
-                        "speed": vehicle_speed,
-                        "position": vehicle_position,
-                        "angle": vehicle_angle,
-                        "lane_id": vehicle_lane_id,
-                        "co2_emission": CO2emission,
-                        "co_emission": COemission,
-                        "pm_emission": PMxEmission,
-                        "electricity_consumption": ElectricityConsumption,
-                        "fuel_consumption": FuelConsumption,
-                        "noise": NoiseEmission
-                        
-                    }
+                    # Aggiorniamo tutti gli attributi ogni tick
+                    if carla_actor_id not in self.vehicle_data:
+                        # Inizializza se il veicolo non esiste già
+                        self.vehicle_data[carla_actor_id] = {
+                            "type": vehicle_type,
+                            "acceleration": vehicle_acc,
+                            "speed": [round(vehicle_speed,3)],  # Inizializziamo l'array della velocità
+                            "position": vehicle_position,
+                            "angle": vehicle_angle,
+                            "lane_id": vehicle_lane_id,
+                            "co2_emission": CO2emission,
+                            "co_emission": COemission,
+                            "pm_emission": PMxEmission,
+                            "electricity_consumption": ElectricityConsumption,
+                            "fuel_consumption": FuelConsumption,
+                            "noise": NoiseEmission
+                        }
+                    else:
+                        # Aggiorniamo gli attributi esistenti e accodiamo la velocità
+                        self.vehicle_data[carla_actor_id].update({
+                            "type": vehicle_type,
+                            "acceleration": vehicle_acc,
+                            "position": vehicle_position,
+                            "angle": vehicle_angle,
+                            "lane_id": vehicle_lane_id,
+                            "co2_emission": CO2emission,
+                            "co_emission": COemission,
+                            "pm_emission": PMxEmission,
+                            "electricity_consumption": ElectricityConsumption,
+                            "fuel_consumption": FuelConsumption,
+                            "noise": NoiseEmission
+                        })
+                        # Aggiungiamo la velocità corrente all'array delle velocità
+                        self.vehicle_data[carla_actor_id]["speed"].append(round(vehicle_speed,3))
 
             # Scrittura del dizionario su file
             with FileLock(f"{self.output_file}.lock"):
                 with open(self.output_file, 'w') as file:
                     json.dump(self.vehicle_data, file, indent=4)
 
-
         except traci.exceptions.TraCIException:
             print("Error retrieving vehicle information.")
 
+
+            
+        
     def close(self):
         """
         Cleans synchronization.
