@@ -65,27 +65,39 @@ def calculate_speed_metrics(data, veicolo_selezionato):
     all_speeds = [sum(vehicle['speed']) / len(vehicle['speed']) for _, vehicle in data.iterrows() if vehicle['speed']]
     avg_speed_all = sum(all_speeds) / len(all_speeds) if all_speeds else 0
     
-    # Memorizza i valori storici
-    avg_speed_selected_history.append(avg_speed_selected)
-    avg_last_speed_all_history.append(avg_last_speed_all)
-    avg_speed_all_history.append(avg_speed_all)
-    
     return avg_speed_selected, avg_last_speed_all, avg_speed_all
 
+
+
+def gather_all_speeds(data):
+    # Crea un dizionario per contenere le velocità di ciascun veicolo
+    speeds_over_time = {}
+
+    # Trova la lunghezza massima tra le velocità dei veicoli
+    max_length = max(len(vehicle['speed']) for _, vehicle in data.iterrows())
+
+    # Itera su ogni veicolo nel dataset
+    for _, vehicle in data.iterrows():
+        vehicle_id = vehicle['id']
+        speeds = vehicle['speed']
+        
+        # Aggiungi NaN per uniformare la lunghezza a max_length
+        if len(speeds) < max_length:
+            speeds = np.pad(speeds, (0, max_length - len(speeds)), constant_values=np.nan)
+        
+        speeds_over_time[vehicle_id] = speeds
+
+    return speeds_over_time
 
 
 
 # Carica i dati
 data = load_data()
 
-avg_speed_selected_history = []
-avg_last_speed_all_history = []
-avg_speed_all_history = []
-
 
 st.title('Vehicles Watcher')
 
-# 2. Mantieni l'ultimo ID selezionato
+# Mantieni l'ultimo ID selezionato
 if 'last_selected' not in st.session_state:
     st.session_state.last_selected = data['id'].tolist()[0]
     
@@ -174,8 +186,6 @@ while True:
                 st.write("**Road ID:**", lane_id)
         
         
-        
-        
         # Nuova riga per le nuove metriche
         st.write("---")  # Linea orizzontale per separare le sezioni
         st.write("### Emissions & Consumptions")
@@ -222,7 +232,16 @@ while True:
         st.write("**All Vehicles Average Speed (Last Instant):** ", round(avg_last_speed_all, 2), "**m/s**")
         st.write("**All Vehicles Average Speed (Overall):** ", round(avg_speed_all, 2),  "**m/s**")
 
-        st.line_chart(speed)
+        
+        st.write("### Vehicles' Speed Plot")
+        # Recupera tutte le velocità dei veicoli
+        speeds_over_time = gather_all_speeds(data)
+
+        # Creare un DataFrame con le velocità
+        df_speeds = pd.DataFrame(speeds_over_time)
+
+        # Visualizzare il grafico con tutte le velocità dei veicoli
+        st.line_chart(df_speeds)
         
     else:
         st.write('Nessun veicolo trovato con questo ID.')
