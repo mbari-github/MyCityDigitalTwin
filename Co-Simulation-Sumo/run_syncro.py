@@ -110,11 +110,17 @@ class SimulationSynchronization(object):
         # Pulizia del file JSON all'avvio
         with open(self.output_file, 'w') as file:
             json.dump({}, file)
+        
+        # Nuovo: contatore per tracciare gli step della simulazione
+        self.step_counter = 0
 
     def tick(self):
         """
         Tick to simulation synchronization
         """
+        # Incremente il contatore a ogni tick
+        self.step_counter += 1
+        
         # -----------------
         # sumo-->carla sync
         # -----------------
@@ -261,7 +267,8 @@ class SimulationSynchronization(object):
                             "pm_emission": PMxEmission,
                             "electricity_consumption": ElectricityConsumption,
                             "fuel_consumption": FuelConsumption,
-                            "noise": NoiseEmission
+                            "noise": NoiseEmission,
+                            "step_count": self.step_counter
                         }
                     else:
                         # Aggiorniamo gli attributi esistenti e accodiamo la velocità
@@ -276,11 +283,13 @@ class SimulationSynchronization(object):
                             "pm_emission": PMxEmission,
                             "electricity_consumption": ElectricityConsumption,
                             "fuel_consumption": FuelConsumption,
-                            "noise": NoiseEmission
+                            "noise": NoiseEmission,
+                            "step_count": self.step_counter
                         })
                         # Aggiungiamo la velocità corrente all'array delle velocità
                         self.vehicle_data[carla_actor_id]["speed"].append(round(vehicle_speed,3))
-
+            
+            
             # Scrittura del dizionario su file
             with FileLock(f"{self.output_file}.lock"):
                 with open(self.output_file, 'w') as file:

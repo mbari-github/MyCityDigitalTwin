@@ -69,25 +69,62 @@ def calculate_speed_metrics(data, veicolo_selezionato):
 
 
 
-def gather_all_speeds(data):
+def gather_all_speeds_padded(data):
+    # Ottieni il valore di step_count dal primo veicolo (dato che è comune a tutti)
+    step_count = data['step_count'].values[0]
+    
     # Crea un dizionario per contenere le velocità di ciascun veicolo
     speeds_over_time = {}
-
-    # Trova la lunghezza massima tra le velocità dei veicoli
-    max_length = max(len(vehicle['speed']) for _, vehicle in data.iterrows())
 
     # Itera su ogni veicolo nel dataset
     for _, vehicle in data.iterrows():
         vehicle_id = vehicle['id']
         speeds = vehicle['speed']
         
-        # Aggiungi NaN per uniformare la lunghezza a max_length
-        if len(speeds) < max_length:
-            speeds = np.pad(speeds, (0, max_length - len(speeds)), constant_values=np.nan)
+        # Aggiungi NaN all'inizio dell'array per uniformare la lunghezza a step_count
+        if len(speeds) < step_count:
+            speeds = np.pad(speeds, (step_count - len(speeds), 0), constant_values=np.nan)
         
         speeds_over_time[vehicle_id] = speeds
 
     return speeds_over_time
+
+def calculate_cumulative_avg_speed(veicolo_selezionato):
+    # Ottieni il vettore delle velocità del veicolo selezionato
+    speed = veicolo_selezionato['speed'].values[0]
+    
+    # Ottieni il numero totale di step di simulazione (step_count)
+    step_count = len(speed)
+    
+    # Inizializza un array per le velocità medie cumulative
+    cumulative_avg_speed = np.zeros(step_count)
+    
+    # Calcola la media cumulativa per ogni step
+    for i in range(1, step_count + 1):
+        cumulative_avg_speed[i - 1] = np.mean(speed[:i])
+    
+    return cumulative_avg_speed
+
+#def calculate_all_vehicles_avg_speed_last_instant(data):
+    # Ottieni il valore di step_count dal primo veicolo (dato che è comune a tutti)
+    step_count = data['step_count'].values[0]
+    
+    avg_speed_array = []
+
+    for step in range(step_count):
+        speeds_at_step = [
+            vehicle['speed'][step] for _, vehicle in data.iterrows()
+            if step < len(vehicle['speed']) and not np.isnan(vehicle['speed'][step])
+        ]
+        
+        if speeds_at_step:
+            avg_speed_step = sum(speeds_at_step) / len(speeds_at_step)
+        else:
+            avg_speed_step = np.nan
+        
+        avg_speed_array.append(avg_speed_step)
+
+    return avg_speed_array
 
 
 
@@ -159,6 +196,13 @@ while True:
         
         #Aggiorna le info su velocità medie
         avg_speed_selected, avg_last_speed_all, avg_speed_all = calculate_speed_metrics(data, veicolo_selezionato)
+        
+        # Calcola l'array della velocità media cumulativa per il veicolo selezionato
+        cumulative_avg_speed_array = calculate_cumulative_avg_speed(veicolo_selezionato)
+        
+        # Calcola la velocità media di tutti i veicoli all'ultimo istante (per ogni step)
+        #avg_speed_all_vehicles_last_instant_array = calculate_all_vehicles_avg_speed_last_instant(data)
+        
 
         
         
@@ -184,6 +228,17 @@ while True:
             with col2:
                 st.write("**Angle:**", round(angle, 2))
                 st.write("**Road ID:**", lane_id)
+        
+        
+        # Creare un DataFrame con la velocità effettiva e quella media cumulativa
+        speed_data = pd.DataFrame({
+            'Selected Vehicle Speed': speed,  # Array della velocità effettiva
+            'Selected Vehicle Average Speed': cumulative_avg_speed_array  # Array della velocità media cumulativa
+        })
+
+        # Visualizzare entrambe le serie sullo stesso grafico
+        st.write("### Vehicle Speed and Average Speed")
+        st.line_chart(speed_data)
         
         
         # Nuova riga per le nuove metriche
@@ -233,15 +288,18 @@ while True:
         st.write("**All Vehicles Average Speed (Overall):** ", round(avg_speed_all, 2),  "**m/s**")
 
         
-        st.write("### Vehicles' Speed Plot")
+        #st.write("### All Vehicles' Speed Plot")
         # Recupera tutte le velocità dei veicoli
-        speeds_over_time = gather_all_speeds(data)
+        #speeds_over_time = gather_all_speeds_padded(data)
 
         # Creare un DataFrame con le velocità
-        df_speeds = pd.DataFrame(speeds_over_time)
+        #df_speeds = pd.DataFrame(speeds_over_time)
 
         # Visualizzare il grafico con tutte le velocità dei veicoli
-        st.line_chart(df_speeds)
+        #st.line_chart(df_speeds)
+        
+        
+
         
     else:
         st.write('Nessun veicolo trovato con questo ID.')
