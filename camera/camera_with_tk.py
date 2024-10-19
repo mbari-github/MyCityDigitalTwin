@@ -29,15 +29,19 @@ def update_ui(file_path, vehicle_id, speed_label, acceleration_label, type_label
     vehicle_info = read_vehicle_info_from_json(file_path, vehicle_id)
     if vehicle_info:
         try:
-            speed = vehicle_info.get("speed", "N/A")
+            # Estrai i valori dal veicolo
+            speed_array = vehicle_info.get("speed", [])
             acceleration = vehicle_info.get("acceleration", "N/A")
             vehicle_type = vehicle_info.get("type", "N/A")
             lane_id = vehicle_info.get("lane_id", "N/A")
+            
+            # Calcola la velocità (prendi l'ultimo valore dell'array speed)
+            speed = speed_array[-1] if speed_array else "N/A"  # Ultimo valore dell'array speed
 
             # Aggiorna l'interfaccia utente
             id_label.config(text=f"ID: {vehicle_id}")
             type_label.config(text=f"Type: {vehicle_type}")
-            speed_label.config(text=f"Speed: {speed:.2f} km/h")
+            speed_label.config(text=f"Speed: {speed:.2f} km/h" if isinstance(speed, (int, float)) else "Speed: N/A")
             acceleration_label.config(text=f"Acceleration: {acceleration:.2f} m/s²")
             lane_id_label.config(text=f"Lane ID: {lane_id}")
             
@@ -143,7 +147,6 @@ def main():
 
         acceleration_label = tk.Label(root, text="Acceleration: N/A", font=("Helvetica", 16))
         acceleration_label.pack(pady=5)
-
 
         # Se è stato fornito un ID, inizia automaticamente a seguire il veicolo
         if args.id:

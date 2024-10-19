@@ -1,10 +1,43 @@
 import carla
 import random
 import time
-import sys
-import keyboard
+import threading
 
-flag=True
+class VehicleFollower:
+    def __init__(self, spectator):
+        self.spectator = spectator
+        self.following_thread = None
+        self.flag = False
+
+    def follow_vehicle(self, vehicle):
+        """
+        Segui il veicolo specificato e aggiorna la posizione della telecamera.
+        """
+        self.flag = True
+        while self.flag:
+            transform = vehicle.get_transform()
+
+            # Offset per la telecamera (dietro e sopra il veicolo)
+            offset = carla.Location(x=-10, z=5)
+
+            # Calcola la nuova posizione della telecamera
+            location = transform.location + transform.rotation.get_forward_vector() * offset.x + carla.Location(z=offset.z)
+
+            # Orienta la telecamera verso il veicolo
+            rotation = transform.rotation
+            rotation.pitch = -20
+            rotation.roll = 0
+
+            # Imposta la trasformazione della telecamera
+            self.spectator.set_transform(carla.Transform(location, rotation))
+
+            time.sleep(0.05)  # Aggiorna la posizione della telecamera ogni 50 millisecondi
+
+    def stop_following(self):
+        """Ferma l'inseguimento del veicolo corrente."""
+        if self.following_thread is not None:
+            self.flag = False
+            self.following_thread.join()  # Aspetta che il thread finisca
 
 def main():
     # Connettiti al server CARLA
@@ -20,9 +53,14 @@ def main():
 
     print("Connesso al server CARLA. Premi ENTER per seguire un veicolo casuale.")
 
+    vehicle_follower = VehicleFollower(spectator)
+
     try:
         while True:
             input()  # Attendi che l'utente prema ENTER
+            
+            # Ferma l'inseguimento del veicolo corrente se è in corso
+            vehicle_follower.stop_following()
             
             # Ottieni tutti i veicoli attualmente nella simulazione
             vehicles = world.get_actors().filter('vehicle.*')
@@ -31,38 +69,23 @@ def main():
                 # Se ci sono veicoli, seleziona un veicolo casuale
                 vehicle = random.choice(vehicles)
                 
-                print(f"La telecamera sta seguendo il veicolo con id: {vehicle.id}")
-                flag=True
-                
-                # Aggiorna la posizione della telecamera per seguire il veicolo selezionato
-                while flag:
-                    transform = vehicle.get_transform()
-                    
-                    # Offset per la telecamera (dietro e sopra il veicolo)
-                    offset = carla.Location(x=-10, z=5)
-                    
-                    # Calcola la nuova posizione della telecamera
-                    location = transform.location + transform.rotation.get_forward_vector() * offset.x + carla.Location(z=offset.z)
-                    
-                    # Orienta la telecamera verso il veicolo
-                    rotation = transform.rotation
-                    rotation.pitch = -20
-                    rotation.roll = 0
-                    
-                    # Imposta la trasformazione della telecamera
-                    spectator.set_transform(carla.Transform(location, rotation))
-                    
-                    
-                    if keyboard.is_pressed('enter'):
-                        flag=False;
+                print(f"La telecamera sta seguendo il veicolo con ID: {vehicle.id}")
 
-                    time.sleep(0.05)  # Aggiorna la posizione della telecamera ogni 50 millisecondi
+                # Inizia a seguire il veicolo in un nuovo thread
+                vehicle_follower.following_thread = threading.Thread(target=vehicle_follower.follow_vehicle, args=(vehicle,))
+                vehicle_follower.following_thread.start()
 
             else:
                 print("Nessun veicolo trovato nella simulazione.")
 
     except KeyboardInterrupt:
         print("Uscita dal programma.")
+        vehicle_follower.stop_following()  # Assicurati di fermare l'inseguimento
+    except Exception as e:
+        print(f"Errore: {e}")
+    finally:
+        print("Disconnetti dal server CARLA.")
+        client.close()  # Chiudi la connessione al server CARLA
 
 if __name__ == '__main__':
     main()
