@@ -67,9 +67,7 @@ def calculate_speed_metrics(data, veicolo_selezionato):
     
     return avg_speed_selected, avg_last_speed_all, avg_speed_all
 
-
-
-def gather_all_speeds_padded(data):
+#def gather_all_speeds_padded(data):
     # Ottieni il valore di step_count dal primo veicolo (dato che è comune a tutti)
     step_count = data['step_count'].values[0]
     
@@ -89,6 +87,26 @@ def gather_all_speeds_padded(data):
 
     return speeds_over_time
 
+def add_padding_to_speed(speed, data):
+    # Calcola la lunghezza attuale del vettore speed
+    current_length = len(speed)
+    step_count = data['step_count'].values[0]
+
+    
+    # Calcola il padding necessario
+    padding_needed = step_count - current_length
+    
+    # Aggiungi NaN come padding se necessario
+    if padding_needed > 0:
+        # Crea un array di NaN con la dimensione necessaria
+        padding = np.full(padding_needed, np.nan)
+        # Restituisci l'array di padding seguito dal vettore speed
+        return np.concatenate((padding, speed))
+    
+    # Se non è necessario padding, restituisci il vettore speed così com'è
+    return speed
+
+
 def calculate_cumulative_avg_speed(veicolo_selezionato):
     # Ottieni il vettore delle velocità del veicolo selezionato
     speed = veicolo_selezionato['speed'].values[0]
@@ -105,27 +123,29 @@ def calculate_cumulative_avg_speed(veicolo_selezionato):
     
     return cumulative_avg_speed
 
-#def calculate_all_vehicles_avg_speed_last_instant(data):
-    # Ottieni il valore di step_count dal primo veicolo (dato che è comune a tutti)
-    step_count = data['step_count'].values[0]
+
+def calculate_all_vehicles_avg_speed_per_instant(data):
+    # Crea una lista per memorizzare le velocità di tutti i veicoli
+    all_speeds = []
     
-    avg_speed_array = []
-
-    for step in range(step_count):
-        speeds_at_step = [
-            vehicle['speed'][step] for _, vehicle in data.iterrows()
-            if step < len(vehicle['speed']) and not np.isnan(vehicle['speed'][step])
-        ]
-        
-        if speeds_at_step:
-            avg_speed_step = sum(speeds_at_step) / len(speeds_at_step)
-        else:
-            avg_speed_step = np.nan
-        
-        avg_speed_array.append(avg_speed_step)
-
-    return avg_speed_array
-
+    # Itera su ogni veicolo nel DataFrame
+    for _, vehicle in data.iterrows():
+        all_speeds.append(vehicle['speed'])
+    
+    # Calcolo della lunghezza massima degli array di velocità
+    max_length = data['step_count'].values[0]
+    
+    # Applico padding per uniformare la lunghezza degli array di velocità
+    padded_speeds = [np.pad(vehicle_speed, (0, max_length - len(vehicle_speed)), 'constant', constant_values=np.nan)
+                     for vehicle_speed in all_speeds]
+    
+    # Converto in array numpy
+    speeds_array = np.array(padded_speeds)
+    
+    # Calcolo della velocità media per ogni istante, ignorando i NaN
+    avg_speed_all_vehicles_per_instant = np.nanmean(speeds_array, axis=0)
+    
+    return avg_speed_all_vehicles_per_instant
 
 
 # Carica i dati
@@ -202,6 +222,8 @@ while True:
         
         # Calcola la velocità media di tutti i veicoli all'ultimo istante (per ogni step)
         #avg_speed_all_vehicles_last_instant_array = calculate_all_vehicles_avg_speed_last_instant(data)
+        avg_speed_all_vehicles_per_instant = calculate_all_vehicles_avg_speed_per_instant(data)
+
         
 
         
@@ -232,8 +254,9 @@ while True:
         
         # Creare un DataFrame con la velocità effettiva e quella media cumulativa
         speed_data = pd.DataFrame({
-            'Selected Vehicle Speed': speed,  # Array della velocità effettiva
-            'Selected Vehicle Average Speed': cumulative_avg_speed_array  # Array della velocità media cumulativa
+            'Selected Vehicle Speed': add_padding_to_speed(speed, data),  # Array della velocità effettiva
+            #'Selected Vehicle Average Speed': cumulative_avg_speed_array,  # Array della velocità media cumulativa
+            'All Vehicles Average Speed': avg_speed_all_vehicles_per_instant
         })
 
         # Visualizzare entrambe le serie sullo stesso grafico
