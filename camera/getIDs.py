@@ -1,5 +1,4 @@
 import carla
-import time
 
 def main():
     try:
@@ -12,14 +11,20 @@ def main():
         world = client.get_world()
 
         # Ottieni tutti gli attori nella simulazione e filtra solo i veicoli
-        vehicles = world.get_actors().filter('vehicle.*')
-
-        if vehicles:
-            print("ID dei veicoli nella simulazione:")
-            for vehicle in vehicles:
-                print(f"Veicolo ID: {vehicle.id}")
+        vehicles = world.get_actors()
+        IDs = []
+        i=1
+        print(len(vehicles))
+        for vehicle in vehicles:
+            i=i+1
+            IDs.append(vehicle.id) 
+        
+        if IDs:  
+            print("Veicoli trovati:", IDs)
+            print(i)
         else:
             print("Nessun veicolo trovato nella simulazione.")
+            print(i)
 
     except Exception as e:
         print(f"Errore: {e}")

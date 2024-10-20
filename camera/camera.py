@@ -85,7 +85,7 @@ def main():
         print(f"Errore: {e}")
     finally:
         print("Disconnetti dal server CARLA.")
-        client.close()  # Chiudi la connessione al server CARLA
+        client.close()  
 
 if __name__ == '__main__':
     main()
