@@ -25,16 +25,6 @@ def follow_vehicle_by_id(world, vehicle_id):
 
         spectator.set_transform(carla.Transform(location, rotation))
 
-        # Estrai i valori dal veicolo
-        speed = vehicle.get_velocity()
-        speed_kmh = (speed.x**2 + speed.y**2 + speed.z**2)**0.5 * 3.6  # Converti in km/h
-        acceleration = vehicle.get_acceleration()
-        acceleration_m_s2 = (acceleration.x**2 + acceleration.y**2 + acceleration.z**2)**0.5  # in m/s²
-
-        # Stampa le informazioni sul veicolo
-        print(f"ID: {vehicle.id}, Speed: {speed_kmh:.2f} km/h, Acceleration: {acceleration_m_s2:.2f} m/s²")
-        
-        # Aspetta un attimo prima di aggiornare
         time.sleep(0.1)
 
 def main():
