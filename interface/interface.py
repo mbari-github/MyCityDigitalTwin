@@ -5,6 +5,8 @@ import json
 import os
 import time
 from filelock import FileLock
+import warnings
+
 
 # Funzione per caricare i dati dal file JSON
 def load_data():
@@ -124,28 +126,29 @@ def calculate_cumulative_avg_speed(veicolo_selezionato):
     return cumulative_avg_speed
 
 
-def calculate_all_vehicles_avg_speed_per_instant(data):
-    # Crea una lista per memorizzare le velocità di tutti i veicoli
-    all_speeds = []
-    
-    # Itera su ogni veicolo nel DataFrame
+def calculate_avg_speed_with_padding(data):
+    # Inizializza una lista per memorizzare le velocità di ogni veicolo con padding
+    padded_speeds = []
+
+    # Aggiungi padding a tutti i vettori speed
     for _, vehicle in data.iterrows():
-        all_speeds.append(vehicle['speed'])
+        speed_with_padding = add_padding_to_speed(vehicle['speed'], data)
+        padded_speeds.append(speed_with_padding)
     
-    # Calcolo della lunghezza massima degli array di velocità
-    max_length = data['step_count'].values[0]
+    # Converti la lista in un array numpy
+    padded_speeds_array = np.array(padded_speeds)
     
-    # Applico padding per uniformare la lunghezza degli array di velocità
-    padded_speeds = [np.pad(vehicle_speed, (0, max_length - len(vehicle_speed)), 'constant', constant_values=np.nan)
-                     for vehicle_speed in all_speeds]
+    # Calcola la media per ogni elemento i-esimo, gestendo i casi in cui sono tutti NaN
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", category=RuntimeWarning)
+        avg_speed_per_step = np.nanmean(padded_speeds_array, axis=0)
     
-    # Converto in array numpy
-    speeds_array = np.array(padded_speeds)
     
-    # Calcolo della velocità media per ogni istante, ignorando i NaN
-    avg_speed_all_vehicles_per_instant = np.nanmean(speeds_array, axis=0)
-    
-    return avg_speed_all_vehicles_per_instant
+    return avg_speed_per_step
+
+
+
+
 
 
 # Carica i dati
@@ -195,9 +198,14 @@ while True:
     # Aggiorna la lista di ID veicoli nel caso sia cambiata
     id_veicoli = data['id'].tolist()
 
+    # Verifica se l'ID selezionato esiste ancora
+    if st.session_state.last_selected not in id_veicoli:
+        # Se l'ID non esiste più, seleziona il primo ID nella lista
+        st.session_state.last_selected = id_veicoli[0]
+
     # Trova i dati del veicolo selezionato
     veicolo_selezionato = data[data['id'] == st.session_state.last_selected]
-
+    
     if not veicolo_selezionato.empty:
         st.subheader('Selected vehicle\'s data:')
         
@@ -222,7 +230,7 @@ while True:
         
         # Calcola la velocità media di tutti i veicoli all'ultimo istante (per ogni step)
         #avg_speed_all_vehicles_last_instant_array = calculate_all_vehicles_avg_speed_last_instant(data)
-        avg_speed_all_vehicles_per_instant = calculate_all_vehicles_avg_speed_per_instant(data)
+        avg_speed_all_vehicles_per_instant = calculate_avg_speed_with_padding(data)
 
         
 
@@ -328,5 +336,5 @@ while True:
         st.write('Nessun veicolo trovato con questo ID.')
 
     # Attende qualche secondo prima di ricaricare i dati
-    time.sleep(0.1)
+    time.sleep(0.3)
     st.experimental_rerun()  # Rerun the app to refresh the data and metrics

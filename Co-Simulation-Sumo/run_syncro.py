@@ -111,9 +111,9 @@ class SimulationSynchronization(object):
         with open(self.output_file, 'w') as file:
             json.dump({}, file)
         
-        # Nuovo: contatore per tracciare gli step della simulazione
+        # Contatore per tracciare gli step della simulazione
         self.step_counter = 0
-
+        
     def tick(self):
         """
         Tick to simulation synchronization
@@ -129,6 +129,7 @@ class SimulationSynchronization(object):
         # Spawning new sumo actors in carla (i.e, not controlled by carla).
         sumo_spawned_actors = self.sumo.spawned_actors - set(self.carla2sumo_ids.values())
         for sumo_actor_id in sumo_spawned_actors:
+            
             self.sumo.subscribe(sumo_actor_id)
             sumo_actor = self.sumo.get_actor(sumo_actor_id)
 
@@ -147,6 +148,7 @@ class SimulationSynchronization(object):
         for sumo_actor_id in self.sumo.destroyed_actors:
             if sumo_actor_id in self.sumo2carla_ids:
                 self.carla.destroy_actor(self.sumo2carla_ids.pop(sumo_actor_id))
+                
 
         # Updating sumo actors in carla.
         for sumo_actor_id in self.sumo2carla_ids:
@@ -191,11 +193,12 @@ class SimulationSynchronization(object):
                 if sumo_actor_id != INVALID_ACTOR_ID:
                     self.carla2sumo_ids[carla_actor_id] = sumo_actor_id
                     self.sumo.subscribe(sumo_actor_id)
-
+                    
         # Destroying required carla actors in sumo.
         for carla_actor_id in self.carla.destroyed_actors:
             if carla_actor_id in self.carla2sumo_ids:
                 self.sumo.destroy_actor(self.carla2sumo_ids.pop(carla_actor_id))
+                
 
         # Updating carla actors in sumo.
         for carla_actor_id in self.carla2sumo_ids:
@@ -289,6 +292,9 @@ class SimulationSynchronization(object):
                         # Aggiungiamo la velocità corrente all'array delle velocità
                         self.vehicle_data[carla_actor_id]["speed"].append(round(vehicle_speed,3))
             
+            
+            # Filtra i veicoli che hanno un 'step_count' minore di 'self.step_counter'
+            self.vehicle_data = {k: v for k, v in self.vehicle_data.items() if v["step_count"] == self.step_counter}
             
             # Scrittura del dizionario su file
             with FileLock(f"{self.output_file}.lock"):
